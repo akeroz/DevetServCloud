@@ -1,0 +1,39 @@
+# Exemple de fichier de configuration Terraform
+# Copiez ce fichier vers terraform.tfvars et modifiez les valeurs
+
+# OBLIGATOIRE: ID de votre projet GCP
+project_id = "mon-projet-gcp-123456"
+
+# Nom du projet (utilisé pour nommer les ressources)
+project_name = "mon-projet"
+
+# Région et zone GCP
+region = "europe-west1"
+zone   = "europe-west1-b"
+
+# Configuration réseau
+subnet_cidr = "10.0.1.0/24"
+
+# Sécurité: Limitez l'accès SSH à votre IP publique
+# Pour obtenir votre IP: curl ifconfig.me
+allowed_ssh_sources = ["0.0.0.0/0"] # CHANGEZ CECI en production!
+
+# Configuration de la VM
+machine_type    = "e2-micro"                # Niveau gratuit GCP
+boot_disk_image = "debian-cloud/debian-11"  # ou "ubuntu-os-cloud/ubuntu-2204-lts"
+boot_disk_size  = 10
+boot_disk_type  = "pd-standard"
+
+# Tags réseau
+instance_tags = ["ssh-enabled", "web-server"]
+
+# Configuration SSH (optionnel)
+# Générez une clé SSH avec: ssh-keygen -t rsa -b 4096 -C "votre-email@example.com"
+ssh_user       = "votre-username"
+ssh_public_key = "" # Collez votre clé publique ici (ssh-rsa AAAA...)
+
+# Environnement
+environment = "dev"
+
+# Instance préemptible (moins chère mais peut être arrêtée)
+preemptible = false

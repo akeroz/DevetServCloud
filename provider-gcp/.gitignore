@@ -1,0 +1,41 @@
+# Fichiers Terraform locaux
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+
+# Fichiers de variables contenant des informations sensibles
+terraform.tfvars
+*.auto.tfvars
+
+# Fichiers de logs
+*.log
+
+# Fichiers de clés SSH et credentials
+*.pem
+*.key
+*.json
+gcp-*.json
+
+# Répertoires d'environnement
+.env
+.venv
+
+# Fichiers de crash
+crash.log
+crash.*.log
+
+# Fichiers de plan Terraform
+*.tfplan
+
+# Fichiers d'override
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
