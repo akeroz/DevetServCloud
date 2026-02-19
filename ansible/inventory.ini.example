@@ -1,0 +1,11 @@
+# Inventaire Ansible pour les VMs VirtualBox
+# Copiez ce fichier vers inventory.ini et modifiez avec les IPs de vos VMs
+
+[webservers]
+epsi-project-web ansible_host=192.168.56.10 ansible_user=vagrant ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[databases]
+epsi-project-db ansible_host=192.168.56.11 ansible_user=vagrant ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

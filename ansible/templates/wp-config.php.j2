@@ -1,0 +1,36 @@
+<?php
+/**
+ * Configuration WordPress générée par Ansible
+ */
+
+// ** Réglages MySQL ** //
+define( 'DB_NAME', '{{ wordpress_db_name }}' );
+define( 'DB_USER', '{{ wordpress_db_user }}' );
+define( 'DB_PASSWORD', '{{ wordpress_db_password }}' );
+define( 'DB_HOST', '{{ wordpress_db_host }}' );
+define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_COLLATE', '' );
+
+// ** Clés d'authentification uniques ** //
+define('AUTH_KEY',         'put your unique phrase here');
+define('SECURE_AUTH_KEY',  'put your unique phrase here');
+define('LOGGED_IN_KEY',    'put your unique phrase here');
+define('NONCE_KEY',        'put your unique phrase here');
+define('AUTH_SALT',        'put your unique phrase here');
+define('SECURE_AUTH_SALT', 'put your unique phrase here');
+define('LOGGED_IN_SALT',   'put your unique phrase here');
+define('NONCE_SALT',       'put your unique phrase here');
+
+// ** Préfixe de table ** //
+$table_prefix = 'wp_';
+
+// ** Mode de débogage WordPress ** //
+define( 'WP_DEBUG', false );
+
+// ** Chemin absolu vers le répertoire de WordPress ** //
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+// ** Réglages WordPress et chemins ** //
+require_once ABSPATH . 'wp-settings.php';

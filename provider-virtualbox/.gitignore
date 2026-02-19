@@ -1,0 +1,35 @@
+# Fichiers Terraform locaux
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+
+# Fichiers de variables
+terraform.tfvars
+*.auto.tfvars
+
+# Fichiers de logs
+*.log
+
+# Fichiers de crash
+crash.log
+crash.*.log
+
+# Fichiers de plan Terraform
+*.tfplan
+
+# Fichiers d'override
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Fichiers Vagrant
+.vagrant/
+*.box

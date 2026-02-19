@@ -1,0 +1,13 @@
+# Fichiers d'inventaire avec IPs réelles
+inventory.ini
+
+# Fichiers de configuration sensibles
+*.pem
+*.key
+*.vault
+
+# Logs Ansible
+*.log
+
+# Fichiers de retry
+*.retry

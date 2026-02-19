@@ -1,0 +1,171 @@
+---
+# Playbook Ansible pour installer WordPress sur 2 VMs
+# VM1: Serveur Web (Apache + PHP + WordPress)
+# VM2: Serveur Base de données (MySQL)
+
+# Installation et configuration du serveur de base de données
+- name: Configuration du serveur de base de données MySQL
+  hosts: databases
+  become: yes
+  vars:
+    mysql_root_password: "ChangeMe123!"
+    wordpress_db_name: "wordpress"
+    wordpress_db_user: "wpuser"
+    wordpress_db_password: "WpPassword123!"
+
+  tasks:
+    - name: Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installer MySQL Server
+      apt:
+        name:
+          - mysql-server
+          - python3-pymysql
+        state: present
+
+    - name: Démarrer et activer MySQL
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Configurer MySQL pour accepter les connexions distantes
+      lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        regexp: '^bind-address'
+        line: 'bind-address = 0.0.0.0'
+      notify: Redémarrer MySQL
+
+    - name: Créer la base de données WordPress
+      mysql_db:
+        name: "{{ wordpress_db_name }}"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    - name: Créer l'utilisateur WordPress
+      mysql_user:
+        name: "{{ wordpress_db_user }}"
+        password: "{{ wordpress_db_password }}"
+        priv: "{{ wordpress_db_name }}.*:ALL"
+        host: "%"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+  handlers:
+    - name: Redémarrer MySQL
+      service:
+        name: mysql
+        state: restarted
+
+
+# Installation et configuration du serveur Web WordPress
+- name: Configuration du serveur Web WordPress
+  hosts: webservers
+  become: yes
+  vars:
+    wordpress_db_host: "{{ hostvars[groups['databases'][0]]['ansible_default_ipv4']['address'] }}"
+    wordpress_db_name: "wordpress"
+    wordpress_db_user: "wpuser"
+    wordpress_db_password: "WpPassword123!"
+    wordpress_version: "latest"
+
+  tasks:
+    - name: Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installer Apache, PHP et extensions
+      apt:
+        name:
+          - apache2
+          - php
+          - php-mysql
+          - php-curl
+          - php-gd
+          - php-mbstring
+          - php-xml
+          - php-xmlrpc
+          - php-soap
+          - php-intl
+          - php-zip
+          - libapache2-mod-php
+          - wget
+          - unzip
+        state: present
+
+    - name: Démarrer et activer Apache
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Créer le répertoire WordPress
+      file:
+        path: /var/www/html/wordpress
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    - name: Télécharger WordPress
+      get_url:
+        url: "https://wordpress.org/{{ wordpress_version }}.tar.gz"
+        dest: /tmp/wordpress.tar.gz
+
+    - name: Extraire WordPress
+      unarchive:
+        src: /tmp/wordpress.tar.gz
+        dest: /var/www/html/
+        remote_src: yes
+        owner: www-data
+        group: www-data
+        creates: /var/www/html/wordpress/wp-config-sample.php
+
+    - name: Configurer WordPress (wp-config.php)
+      template:
+        src: wp-config.php.j2
+        dest: /var/www/html/wordpress/wp-config.php
+        owner: www-data
+        group: www-data
+        mode: '0640'
+
+    - name: Configurer le VirtualHost Apache
+      template:
+        src: wordpress.conf.j2
+        dest: /etc/apache2/sites-available/wordpress.conf
+      notify: Redémarrer Apache
+
+    - name: Activer le site WordPress
+      command: a2ensite wordpress.conf
+      args:
+        creates: /etc/apache2/sites-enabled/wordpress.conf
+      notify: Redémarrer Apache
+
+    - name: Désactiver le site par défaut
+      command: a2dissite 000-default.conf
+      args:
+        removes: /etc/apache2/sites-enabled/000-default.conf
+      notify: Redémarrer Apache
+
+    - name: Activer le module rewrite d'Apache
+      apache2_module:
+        name: rewrite
+        state: present
+      notify: Redémarrer Apache
+
+    - name: Définir les permissions correctes
+      file:
+        path: /var/www/html/wordpress
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+  handlers:
+    - name: Redémarrer Apache
+      service:
+        name: apache2
+        state: restarted
